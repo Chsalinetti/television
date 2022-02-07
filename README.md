@@ -1,2 +1,2 @@
-# television
+# Television
 Raspberry PI TV Display
