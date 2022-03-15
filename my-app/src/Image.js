@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import App from './App';
 import './Image.css';
 import radiohead from './images/radiohead.gif';
-import im from './images/psy2.gif';
+import im from './images/radiohead.gif';
 
 class Image extends Component {
 
