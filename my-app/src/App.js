@@ -1,12 +1,12 @@
 import './App.css';
-import radiohead from './radiohead.gif';
 import AlbumArt from './AlbumArt';
+import Image from './Image';
 
 
 function App() {
   return (
     <div className="App">
-      <img className="photo" src={radiohead}/>
+      <Image/>
     </div>
   );
 }
