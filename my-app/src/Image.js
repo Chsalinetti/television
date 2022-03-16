@@ -2,8 +2,7 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
 import './Image.css';
-import radiohead from './images/radiohead.gif';
-import im from './images/radiohead.gif';
+import im from './images/pc.gif';
 
 class Image extends Component {
 
