@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
 import './Image.css';
-import im from './images/dusk.webp';
+import im from './images/redforest.gif';
 
 class Image extends Component {
 
