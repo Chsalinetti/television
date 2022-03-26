@@ -37,6 +37,10 @@ class Image extends Component {
     renderImage=()=> {
         const d = new Date();
         let hour = d.getHours();
+        
+        //test
+        hour = 0;
+
         switch (hour) {
             case 0:
                 return (<img className="photo" src={a}/>);
