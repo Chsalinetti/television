@@ -27,13 +27,29 @@ import i21 from './images/21.webp';
 import i22 from './images/22.webp';
 import i23 from './images/23.webp';
 
+/**
+ * Renders image on screen dependent on the hour
+ * Images by AnasAbdin
+ * https://anasabdin.tumblr.com/
+ */
+
 class Image extends Component {
+    /**
+     * Updates image
+     */
     componentDidMount() {
         this.interval = setInterval(() => this.setState({ time: Date.now() }), 20000);
       }
-      componentWillUnmount() {
+      /**
+       * Resets image update timer
+       */
+    componentWillUnmount() {
         clearInterval(this.interval);
       }
+    /**
+     * Renders differant image every hour
+     * @returns Image
+     */
     renderImage=()=> {
         const d = new Date();
         let hour = d.getHours();
