@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
-import App from './App';
+import App from './Television';
 import './Image.css';
 import i0 from './images/0.webp';
 import i1 from './images/1.webp';
@@ -35,22 +35,11 @@ import i23 from './images/23.webp';
 
 class Image extends Component {
     /**
-     * Updates image
-     */
-    componentDidMount() {
-        this.interval = setInterval(() => this.setState({ time: Date.now() }), 20000);
-      }
-      /**
-       * Resets image update timer
-       */
-    componentWillUnmount() {
-        clearInterval(this.interval);
-      }
-    /**
      * Renders differant image every hour
      * @returns Image
      */
     renderImage=()=> {
+        console.log("Updating background");
         const d = new Date();
         let hour = d.getHours();
 
