@@ -38,34 +38,38 @@ class App extends Component {
 
 
     if (this.state.token === '') {
-      const headers = {
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        auth: {
-          username: CLIENT_ID,
-          password: CLIENT_SECRET,
-        },
-      };
-      const data = {
-        grant_type: 'client_credentials',
-      };
-      
+
+      const hash = window.location.hash
+      let authorization_code = window.localStorage.getItem("access_token")
+
+      if (!authorization_code && hash) {
+        authorization_code = hash.substring(1).split("&").find(elem => elem.startsWith("access_token")).split("=")[1]
+
+        window.location.hash = ""
+        window.localStorage.setItem("authorization_code", authorization_code)
+
+      }
+      if (authorization_code === null) {
+        return;
+      }
+
+      this.setState({token: authorization_code});
+    }
+    else {
       try {
-        const response = await axios.post(
-          'https://accounts.spotify.com/api/token',
-          qs.stringify(data),
-          headers
-        );
-        //console.log(response.data.access_token);
-        this.setState({token: response.data.access_token})
-      } catch (error) {
-        console.log(error);
+        const response = await axios.post('https://accounts.spotify.com/api/token', {
+          headers : {
+            'grant_type':'refresh_token',
+            'refresh_token' : this.state.token,
+            'client_id' : CLIENT_ID ,
+            'client_secret' : CLIENT_SECRET,
+          }
+        })
+      }
+      catch {
+        return;
       }
     }
-
-    
   }
 
 
@@ -117,6 +121,7 @@ class App extends Component {
     return(
       <div className="App">
         {this.renderArt()}
+        <a href={`${AUTH_ENDPOINT}?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=${RESPONSE_TYPE}`}>Login to Spotify</a>
       </div>
     )
   }
