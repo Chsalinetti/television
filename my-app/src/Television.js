@@ -4,12 +4,19 @@ import './Television.css';
 import AlbumArt from './AlbumArt';
 import Image from './Image';
 import axios from 'axios';
+import {useEffect, useState} from 'react';
+import qs from 'qs';
 
+const CLIENT_ID = 'ddc52ef734194f2492bc8bc09c0fe151'
+const CLIENT_SECRET = 'ac27c30b26784086902a2ec1ec6854c3'
+const REDIRECT_URI = "http://localhost:3000"
+const AUTH_ENDPOINT = "https://accounts.spotify.com/authorize"
+const RESPONSE_TYPE = "token"
 
 class App extends Component {
   constructor(props) {
     super(props);
-    this.state = {token: 'BQAX4Sx-glJnj26OMxvIB4iVEhmbsFq380F9-IKyO1Wz6FgkmMoxGiZoV8gMdHNGvjX7vJyC95icGTnut28AMV76_Ix6wCf_pGycwVfLQnX1CsCAAH74vuA2577ilqBm4DmVQRLUnIHbG_XjnfeYjeN2ixBGqd6BJALovoEs',
+    this.state = {token: '',
                   album: ''
                 };
   }
@@ -24,6 +31,44 @@ class App extends Component {
     clearInterval(this.interval);
     this.forceUpdate();
   }
+
+  
+  getToken=async()=> {
+    console.log("Acquiring Token");
+
+
+    if (this.state.token === '') {
+      const headers = {
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        auth: {
+          username: CLIENT_ID,
+          password: CLIENT_SECRET,
+        },
+      };
+      const data = {
+        grant_type: 'client_credentials',
+      };
+      
+      try {
+        const response = await axios.post(
+          'https://accounts.spotify.com/api/token',
+          qs.stringify(data),
+          headers
+        );
+        //console.log(response.data.access_token);
+        this.setState({token: response.data.access_token})
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
+    
+  }
+
+
 
   getArt=async()=> {
     console.log("Updating Album Art")
@@ -48,18 +93,11 @@ class App extends Component {
         }
         
       }
-      if (response.status === 401) {
-        console.log("Expired Token")
-        this.setState({album: ''});
-      }
-      if (response.status === 429) {
-        console.log("Too fast")
-      }
-
-
     }
     catch {
-      console.log("Request Error!")
+      if (this.state.album != '') {
+        this.setState({album: ''});
+      }
     }
   }
 
@@ -75,6 +113,7 @@ class App extends Component {
   }
 
   render() {
+    this.getToken();
     return(
       <div className="App">
         {this.renderArt()}
