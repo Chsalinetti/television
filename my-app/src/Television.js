@@ -11,13 +11,14 @@ const CLIENT_ID = 'ddc52ef734194f2492bc8bc09c0fe151'
 const CLIENT_SECRET = 'ac27c30b26784086902a2ec1ec6854c3'
 const REDIRECT_URI = "http://localhost:3000"
 const AUTH_ENDPOINT = "https://accounts.spotify.com/authorize"
-const RESPONSE_TYPE = "token"
+const RESPONSE_TYPE = "code"
 
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {token: '',
-                  album: ''
+                  album: '',
+                  refresh: '',
                 };
   }
   
@@ -38,22 +39,34 @@ class App extends Component {
 
 
     if (this.state.token === '') {
+      const link = window.location.href
 
-      const hash = window.location.hash
-      let authorization_code = window.localStorage.getItem("access_token")
+      const authorization_code = link.substring(1).split("?").find(elem => elem.startsWith("code")).split("=")[1];
 
-      if (!authorization_code && hash) {
-        authorization_code = hash.substring(1).split("&").find(elem => elem.startsWith("access_token")).split("=")[1]
-
-        window.location.hash = ""
-        window.localStorage.setItem("authorization_code", authorization_code)
-
-      }
       if (authorization_code === null) {
         return;
       }
 
-      this.setState({token: authorization_code});
+
+
+      const response = await axios.post(
+        'https://accounts.spotify.com/api/token', {
+          'grant_type' : 'authorization_code',
+          'code' : authorization_code,
+          'redirect_uri' : REDIRECT_URI,
+        }, {
+          header : {
+            'Authorization' : 'Basic ' + (btoa(CLIENT_ID + ':' + CLIENT_SECRET)),
+            'Content-Type' : 'application/x-www-form-urlencoded',
+          }
+        }
+        
+      );
+
+
+
+      this.setState({token: response.access_token});
+      this.setState({refresh: response.refresh_token});
     }
     else {
       try {
@@ -76,6 +89,9 @@ class App extends Component {
 
   getArt=async()=> {
     console.log("Updating Album Art")
+    if (this.state.token === '') {
+      return;
+    }
     try{
       const response = await axios.get("https://api.spotify.com/v1/me/player/currently-playing", {
         headers: {
@@ -121,7 +137,7 @@ class App extends Component {
     return(
       <div className="App">
         {this.renderArt()}
-        <a href={`${AUTH_ENDPOINT}?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=${RESPONSE_TYPE}`}>Login to Spotify</a>
+        <a href={`${AUTH_ENDPOINT}?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=${RESPONSE_TYPE}&scope=user-read-currently-playing`}>Login to Spotify</a>
       </div>
     )
   }
