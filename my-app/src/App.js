@@ -6,7 +6,7 @@ import Image from './Image';
 function App() {
   return (
     <div className="App">
-      <Image/>
+      <AlbumArt/>
     </div>
   );
 }
