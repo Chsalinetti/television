@@ -5,7 +5,6 @@ import AlbumArt from './AlbumArt';
 import Image from './Image';
 import axios from 'axios';
 import querystring from 'querystring';
-import { Buffer } from 'buffer';
 
 const CLIENT_ID = 'ddc52ef734194f2492bc8bc09c0fe151'
 const CLIENT_SECRET = 'ac27c30b26784086902a2ec1ec6854c3'
@@ -58,7 +57,7 @@ class App extends Component {
           }),
           headers: {
             'content-type': 'application/x-www-form-urlencoded',
-            Authorization: `Basic ${new Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString('base64')}`,
+            Authorization: `Basic ${btoa(`${CLIENT_ID}:${CLIENT_SECRET}`)}`,
           },
         })
         this.setState({refresh: r.data.refresh_token});
@@ -88,7 +87,7 @@ class App extends Component {
         }),
         headers: {
           'content-type': 'application/x-www-form-urlencoded',
-          Authorization: `Basic ${new Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString('base64')}`,
+          Authorization: `Basic ${btoa(`${CLIENT_ID}:${CLIENT_SECRET}`)}`,
         },
       })
       
