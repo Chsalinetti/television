@@ -4,8 +4,8 @@ import './Television.css';
 import AlbumArt from './AlbumArt';
 import Image from './Image';
 import axios from 'axios';
-import {useEffect, useState} from 'react';
-import qs from 'qs';
+import querystring from 'querystring';
+import { Buffer } from 'buffer';
 
 const CLIENT_ID = 'ddc52ef734194f2492bc8bc09c0fe151'
 const CLIENT_SECRET = 'ac27c30b26784086902a2ec1ec6854c3'
@@ -16,14 +16,13 @@ const RESPONSE_TYPE = "code"
 class App extends Component {
   constructor(props) {
     super(props);
-    this.state = {token: '',
-                  album: '',
+    this.state = {album: '',
                   refresh: '',
                 };
   }
   
   componentDidMount() {
-    this.interval = setInterval(() => this.setState({ time: Date.now() }), 5000);
+    this.interval = setInterval(() => this.setState({ time: Date.now() }), 3000);
   }
   /**
    * Resets image update timer
@@ -35,53 +34,40 @@ class App extends Component {
 
   
   getToken=async()=> {
-    console.log("Acquiring Token");
 
-
-    if (this.state.token === '') {
+    if (this.state.refresh === '') {
       const link = window.location.href
-
+      if (link === 'http://localhost:3000/') {
+        return;
+      }
       const authorization_code = link.substring(1).split("?").find(elem => elem.startsWith("code")).split("=")[1];
 
       if (authorization_code === null) {
         return;
       }
 
-
-
-      const response = await axios.post(
-        'https://accounts.spotify.com/api/token', {
-          'grant_type' : 'authorization_code',
-          'code' : authorization_code,
-          'redirect_uri' : REDIRECT_URI,
-        }, {
-          header : {
-            'Authorization' : 'Basic ' + (btoa(CLIENT_ID + ':' + CLIENT_SECRET)),
-            'Content-Type' : 'application/x-www-form-urlencoded',
-          }
-        }
-        
-      );
-
-
-
-      this.setState({token: response.access_token});
-      this.setState({refresh: response.refresh_token});
-    }
-    else {
       try {
-        const response = await axios.post('https://accounts.spotify.com/api/token', {
-          headers : {
-            'grant_type':'refresh_token',
-            'refresh_token' : this.state.token,
-            'client_id' : CLIENT_ID ,
-            'client_secret' : CLIENT_SECRET,
-          }
+        console.log("Acquiring Access Code")
+        const r =await axios({
+          method: 'post',
+          url: 'https://accounts.spotify.com/api/token',
+          data: querystring.stringify({
+            grant_type: 'authorization_code',
+            code: authorization_code,
+            redirect_uri: REDIRECT_URI
+          }),
+          headers: {
+            'content-type': 'application/x-www-form-urlencoded',
+            Authorization: `Basic ${new Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString('base64')}`,
+          },
         })
-      }
-      catch {
+        this.setState({refresh: r.data.refresh_token});
         return;
-      }
+        }
+        catch (err) {
+          console.log(err);
+          return;
+        }
     }
   }
 
@@ -89,25 +75,39 @@ class App extends Component {
 
   getArt=async()=> {
     console.log("Updating Album Art")
-    if (this.state.token === '') {
+    if (this.state.refresh === '') {
       return;
     }
     try{
+      const r = await axios({
+        method: 'post',
+        url: 'https://accounts.spotify.com/api/token',
+        data: querystring.stringify({
+          grant_type: 'refresh_token',
+          refresh_token: this.state.refresh,
+        }),
+        headers: {
+          'content-type': 'application/x-www-form-urlencoded',
+          Authorization: `Basic ${new Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString('base64')}`,
+        },
+      })
+      
+
       const response = await axios.get("https://api.spotify.com/v1/me/player/currently-playing", {
         headers: {
-          'Authorization': `Bearer ${this.state.token}`
+          'Authorization': `Bearer ${r.data.access_token}`
         }
       });
 
       //console.log(response.data.item.album.images[0].url);
       if (response.status === 200) {
         if (response.data.is_playing) {
-          if (this.state.album != response.data.item.album.images[0].url) {
+          if (this.state.album !== response.data.item.album.images[0].url) {
             this.setState({album: response.data.item.album.images[0].url});
           }
         }
         else {
-          if (this.state.album != '') {
+          if (this.state.album !== '') {
             this.setState({album: ''});
           }
         }
@@ -115,7 +115,7 @@ class App extends Component {
       }
     }
     catch {
-      if (this.state.album != '') {
+      if (this.state.album !== '') {
         this.setState({album: ''});
       }
     }
