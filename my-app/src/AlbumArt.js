@@ -11,7 +11,7 @@ class AlbumArt extends Component {
   }
 
 renderArt=()=> {
-  return (<img className="photo" src={this.props.albumArt}/>);
+  return (<img className="album" src={this.props.albumArt}/>);
 }
 
   render() {
