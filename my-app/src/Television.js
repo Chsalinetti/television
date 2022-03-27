@@ -5,9 +5,10 @@ import AlbumArt from './AlbumArt';
 import Image from './Image';
 import axios from 'axios';
 import querystring from 'querystring';
+import {CLIENT_SECRET} from './sec';
 
 const CLIENT_ID = 'ddc52ef734194f2492bc8bc09c0fe151'
-const CLIENT_SECRET = 'ac27c30b26784086902a2ec1ec6854c3'
+
 const REDIRECT_URI = "http://localhost:3000"
 const AUTH_ENDPOINT = "https://accounts.spotify.com/authorize"
 const RESPONSE_TYPE = "code"
