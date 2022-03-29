@@ -5,10 +5,12 @@ import AlbumArt from './AlbumArt';
 import Image from './Image';
 import axios from 'axios';
 import querystring from 'querystring';
+//create a sec.js file in src with the following:
+//export const CLIENT_SECRET = '<Spotify Client Secret>';
+
 import {CLIENT_SECRET} from './sec';
 
 const CLIENT_ID = 'ddc52ef734194f2492bc8bc09c0fe151'
-
 const REDIRECT_URI = "http://localhost:3000"
 const AUTH_ENDPOINT = "https://accounts.spotify.com/authorize"
 const RESPONSE_TYPE = "code"
@@ -32,7 +34,10 @@ class App extends Component {
     this.forceUpdate();
   }
 
-  
+  /**
+   * 
+   * @returns Gets refresh token from Spotify after logging in.
+   */
   getToken=async()=> {
 
     if (this.state.refresh === '') {
@@ -48,6 +53,7 @@ class App extends Component {
 
       try {
         console.log("Acquiring Access Code")
+        //Acquires token and refresh token from Spotify
         const r =await axios({
           method: 'post',
           url: 'https://accounts.spotify.com/api/token',
@@ -72,13 +78,17 @@ class App extends Component {
   }
 
 
-
+/**
+ * Gets current album from Spotify
+ * @returns Album Link
+ */
   getArt=async()=> {
     console.log("Updating Album Art")
     if (this.state.refresh === '') {
       return;
     }
     try{
+      //Get token from Spotify using refresh token
       const r = await axios({
         method: 'post',
         url: 'https://accounts.spotify.com/api/token',
@@ -92,7 +102,7 @@ class App extends Component {
         },
       })
       
-
+      //Gets album art from Spotify
       const response = await axios.get("https://api.spotify.com/v1/me/player/currently-playing", {
         headers: {
           'Authorization': `Bearer ${r.data.access_token}`
@@ -107,6 +117,7 @@ class App extends Component {
           }
         }
         else {
+          //If not playing, set to nothing
           if (this.state.album !== '') {
             this.setState({album: ''});
           }
@@ -120,7 +131,10 @@ class App extends Component {
       }
     }
   }
-
+/**
+ * Renders either Album art or normal Art
+ * @returns What to render
+ */
   renderArt=()=> {
     console.log("Rerender")
     this.getArt();

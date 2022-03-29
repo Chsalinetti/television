@@ -3,7 +3,9 @@ import ReactDOM from 'react-dom';
 import App from './Television';
 import './AlbumArt.css';
 
-//https://i.scdn.co/image/ab67616d0000b273ee6c91661e0c19cd9514d0da
+/**
+ * Renders album art from given link
+ */
 
 class AlbumArt extends Component {
   constructor(props) {
