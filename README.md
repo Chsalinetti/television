@@ -8,7 +8,7 @@ Spotify's Authorization Code Flow is used to update the user's access tokens, so
 
 Running this program requires my Client Secret in a sec.js file to be in my-app/src with the following format:
 
-### export const CLIENT_SECRET = <Spotify Client Secret>;
+### export const CLIENT_SECRET = 'Spotify Client Secret';
 
 Or, the user may create their own app at developer.spotify.com, with the redirect uri set as http://localhost:3000.
 If this is done, alter the CLIENT_ID constant in Television.js
