@@ -43,9 +43,6 @@ class Image extends Component {
         const d = new Date();
         let hour = d.getHours();
 
-        //test
-        //hour = 3;
-
         switch (hour) {
             case 0:
                 return (<img className="photo" src={i0}/>);
